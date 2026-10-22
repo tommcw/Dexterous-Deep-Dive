@@ -2,7 +2,10 @@ import os
 from os import listdir
 from PIL import Image, ExifTags
 '''
-the puropose of this code is to 
+The puropose of this code is to correct image rotation experienced when training an object detection model. 
+
+To use this code run the file and enter the folder location of the images, the output will identify the rotation,
+and correct the orientation.
 
 Code retrieved from:
 https://stackoverflow.com/questions/13872331/rotating-an-image-with-orientation-specified-in-exif-using-python-without-pil-in
@@ -47,7 +50,7 @@ def fix_image(filepath):
 def main():
 
     # get the path or directory
-    folder_dir = input("Enter the File Directory:")  #"C:/Users/kylee/OneDrive/Documents/USC/ICT 342/Hand py/image_extf_fix/New Folder/test/images"
+    folder_dir = input("Enter the File Directory:")  #"C:/.../test/images"
     for images in os.listdir(folder_dir):
 
         # check if the image ends with png or jpg or jpeg
