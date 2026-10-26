@@ -9,14 +9,18 @@ from ultralytics import YOLO
 
 class Hand_manupultion:
     '''
-    This class works with the Inspire Hand RH56DFTP.
+    This class is intended to work with the Inspire Hand RH56DFTP.
+    Current completion allows for the object detection model to read a video stream and identify objects, 
+    it then takes these observations and identifies when two objects intersect.
+
+    TODO: Complete functions for the hand to begin closing around the object
 
 
     
     '''
 
     def __init__(self):
-        self.hand_ip = "192.168.123.210"
+        self.hand_ip = "192.168.123.210" # change to 192.168.123.211 if using the right hand
         self.fingers = [
             "Pinky",
             "Ring",
@@ -48,7 +52,8 @@ class Hand_manupultion:
     #############################
 
     def check_ip(self):
-        '''Identifies what hand is connected and ensures connection
+        '''
+        Identifies what hand is connected and ensures connection
 
         TODO: does not check if two hands are connected,         
         '''
@@ -89,13 +94,15 @@ class Hand_manupultion:
     #############################
 
     def move_finger(finger,angle,self):
-        '''move a single finger by the given angle
+        '''
+        Move a single finger by the given angle.
 
-             
-            finger is an int value between 0 - 5, 
-                relating to the finger values "Pinky", "Ring", "Middle", "Index", "Thumb bend", "Thumb rotation"
+        finger : int
+            An int value between 0 - 5, 
+            relating to the finger values "Pinky", "Ring", "Middle", "Index", "Thumb bend", "Thumb rotation"
             
-            angle is an int value in the renge 0 - 1000
+        angle : int
+            is an int value in the renge 0 - 1000
 
         '''
         if not 0 <= angle <= 1000: #do nothing
@@ -111,15 +118,17 @@ class Hand_manupultion:
 
 
     def move_fingers(finger_list, angle, self):
-        '''move multiple fingers to a given angle
+        '''
+        move multiple fingers to a given angle
 
-            finger_list is a list of numerical values between 0 - 5, they represent the input of the robotic hand.
-                fingers values relate to "Pinky", "Ring", "Middle", "Index", "Thumb bend", "Thumb rotation"
+        finger_list : list
+            A list of numerical values between 0 - 5, they represent the input of the robotic hand.
+            fingers values relate to "Pinky", "Ring", "Middle", "Index", "Thumb bend", "Thumb rotation"
             
-            angle is an int value in the renge 0 - 1000
+        angle : int 
+            is an int value in the renge 0 - 1000
 
-            use:
-            move_fingers([1,3,4],500)
+        example: move_fingers([1,3,4],500)
     
         '''
         if not 0 <= angle <= 1000: #do nothing
@@ -136,8 +145,13 @@ class Hand_manupultion:
 
 
     def grab_object(max_force, self):
-        ''' function to close hand, stopping will occur when a force reaches the max grip'''
+        '''
+        Function to close hand, stopping will occur when a force reaches the max grip
+        TODO: all
+        '''
         finger_list = [3,4]
+        pass
+        
 
         
     #############################
@@ -147,7 +161,9 @@ class Hand_manupultion:
     #############################
     
     def read_values(self):
-        '''read the angle and force from the hand, '''
+        '''
+        Read the angle and force from the hand, 
+        '''
     
         current_forces = self.hand.read_holding(registers.FORCE_ACT, 6)
         current_angles = self.hand.read_holding(registers.ANGLE_ACT, 6)
@@ -158,7 +174,9 @@ class Hand_manupultion:
 
 
     def _record_loop(self):
-        '''record the values every 0.25sec in the background'''
+        '''
+        Record the values every 0.25sec in the background
+        '''
 
         while self._is_running:
             elapsed_time = time.time() - self._start_time
@@ -173,7 +191,9 @@ class Hand_manupultion:
             time.sleep(0.25)
 
     def record_start(self):
-        '''start recording the hand sensors'''
+        '''
+        Start recording the hand sensors
+        '''
         if self._is_running:
             print("collection is already running")
             return
@@ -186,7 +206,9 @@ class Hand_manupultion:
         self._thread.start()
 
     def record_end(self):
-        '''stop recording the hand sensors'''
+        '''
+        Stop recording the hand sensors
+        '''
         if not self._is_running:
             print("Collection is not currently running")
             return
@@ -199,7 +221,9 @@ class Hand_manupultion:
         return self.sensor_table
 
     def read_records(self):
-        '''iterates through the sensor data and adds labels to the data'''
+        '''
+        Iterates through the sensor data and adds labels to the data
+        '''
         results = {
             "Pinky":{"force":[],"angle":[]},
             "Ring":{"force":[],"angle":[]},
@@ -220,6 +244,9 @@ class Hand_manupultion:
         return results
 
     def graph_grab(self):
+        '''
+        
+        '''
         data = self.read_records()
 
         plt.plot(data["elapsed time"], data["Index"]["force"],color ="blue") # plots the index force
@@ -235,7 +262,11 @@ class Hand_manupultion:
     ############################
 
     def object_detection(self):
-        '''copy from other class, may need updating'''
+        '''
+        Currently Not in Use:
+        copy from other class, may need updating
+        
+        '''
         cap = cv2.VideoCapture(self.camera, cv2.CAP_DSHOW)
         if not cap.isOpened():
             print("DirectShow failed to open camera.")
@@ -321,120 +352,87 @@ class Hand_manupultion:
     # Integration
     #
     ############################
-    def compare2(frame,data):
-        num_items = len(data)
-        if num_items <= 1:
-            return
-        for item in data:
-            print(item)
-
-            
-        
-
+   
     def compare(self,data):
-            ''' compare the confidence of two readings.
-                if the objects are too far away: continue
-                if the objects are 
+        '''
+        compare the confidence of two readings.
+        if the objects are too far away: continue
+        if the objects are 
     
-                TODO: 
-                    Return data needs to be identified and passed
+        TODO: 
+        Return data needs to be identified and passed
     
-            '''
+        '''
             
-            num_items = len(data)
+        num_items = len(data)
             
-            if num_items <=1: #there are no objects to check 
-                return
-            
-            for box_i in data:
-                data.remove(box_i)
-
-                box_i_x1, box_i_y1, box_i_x2, box_i_y2 = box_i["xyxy"]
-
-                box_i_mid_x = (box_i_x1 + box_i_x2)/2
-                box_i_mid_y = (box_i_y1 + box_i_y2)/2
-
-                for box_j in data:
-                    #print(f"Box_i: {(box_i)} \nBox_j: {(box_j)}")
-
-                    if box_i == box_j:
-                        continue
-
-                    box_j_x1, box_j_y1, box_j_x2, box_j_y2 = box_j["xyxy"]
-                   
-                    box_j_mid_x = (box_j_x1 + box_j_x2)/2           
-                    box_j_mid_y = (box_j_y1 + box_j_y2)/2
-
-                    dx = abs(box_i_mid_x - box_j_mid_x)
-                    dy = abs(box_i_mid_y - box_j_mid_y)
-                    #print(f"dx:{dx}, dy:{dy}")
-
-                    if dx <=2 and dy <= 2:
-                        print("I dont think youre supposed to be here")#pass # they might be the same object, more testing?
-                        continue
-                    intersect_x1 = max(box_i_x1,box_j_x1)
-                    intersect_y1 = max(box_i_y1,box_j_y1)
-                    intersect_x2 = min(box_i_x2,box_j_x2)
-                    intersect_y2 = min(box_i_y2,box_j_y2)
-
-                    #print(f"x1,x2:{intersect_x1,intersect_x2}, y1,y2:{intersect_y1,intersect_y2}")
-                    
-                    if (intersect_x1 > intersect_x2) or (intersect_y1 > intersect_y2):
-                        #print("no intersection")
-                        
-                        continue
-                    #print("objects intersect")
-                    
-                    # Check whether one object is a hand
-                    # and the other is an egg or ping-pong ball
-                    i_is_item = box_i["object_num"] in (1, 2)
-                    j_is_item = box_j["object_num"] in (1, 2)
-
-                    i_is_hand = box_i["object_num"] == 0
-                    j_is_hand = box_j["object_num"] == 0
-
-                    if (i_is_item and j_is_hand) or (j_is_item and i_is_hand):
-                        #print("charging my lazers") 
-
-                        if i_is_hand:
-                            print("huston we have liftoff")
-                            pass
-
-
-                        elif j_is_hand:
-                            print("this has been one small step for man")
-                            pass
-
-
-
-                    
-
-                    #if int(abs(box_i_x1 - box_j_x1)<=2) & int(abs(box_i_x2 - box_j_x1)<=2): # if they are in a range of +- 2 equal to match
-                    #    print("I dont think youre supposed to be here")#pass # they might be the same object, more testing?
-
-                    # elif int(abs(box_i["xyxy"][0] - box_j["xyxy"][0])<=40) & int(abs(box_i["xyxy"][1] - box_j["xyxy"][1])<=40):
-                    #     print("charging my lasers ")
-                        
-                    #     if not int(abs(box_i["xyxy"][0] - box_j["xyxy"][0])<=2) & int(abs(box_i["xyxy"][1] - box_j["xyxy"][1])<=2):
-                    #         #check the object class 
-                    #         print("this could be it, Gary")
-                    #         #if hand and egg or pingpong ball close hand 
-                    #         if ((box_i["object_num"] in (1,2)) & (box_j["object_num"]== 0)) or ((box_i["object_num"]== 0) and (box_j["object_num"] in (1,2))):
-                    #             # if object 1 is an egg or pingpong ball and object 2 is a hand or objects 1 and 2 is reversed...
-                    #             # then pick up object
-                    #             print("object will be picked up")
-                    #     print("false alarm")
-                    # else:
-                    #     print("two objects far away")
-                            
+        if num_items <=1: #there are no objects to check 
             return
+            
+        for box_i in data:
+            data.remove(box_i)
+
+            box_i_x1, box_i_y1, box_i_x2, box_i_y2 = box_i["xyxy"]
+
+            box_i_mid_x = (box_i_x1 + box_i_x2)/2
+            box_i_mid_y = (box_i_y1 + box_i_y2)/2
+
+            for box_j in data:
+                #print(f"Box_i: {(box_i)} \nBox_j: {(box_j)}")
+
+                if box_i == box_j:
+                    continue
+
+                box_j_x1, box_j_y1, box_j_x2, box_j_y2 = box_j["xyxy"]
+                   
+                box_j_mid_x = (box_j_x1 + box_j_x2)/2           
+                box_j_mid_y = (box_j_y1 + box_j_y2)/2
+
+                dx = abs(box_i_mid_x - box_j_mid_x)
+                dy = abs(box_i_mid_y - box_j_mid_y)
+                #print(f"dx:{dx}, dy:{dy}")
+
+                if dx <=2 and dy <= 2:
+                    print("I dont think youre supposed to be here")#pass # they might be the same object, more testing?
+                    continue
+                intersect_x1 = max(box_i_x1,box_j_x1)
+                intersect_y1 = max(box_i_y1,box_j_y1)
+                intersect_x2 = min(box_i_x2,box_j_x2)
+                intersect_y2 = min(box_i_y2,box_j_y2)
+
+                #print(f"x1,x2:{intersect_x1,intersect_x2}, y1,y2:{intersect_y1,intersect_y2}")
+                    
+                if (intersect_x1 > intersect_x2) or (intersect_y1 > intersect_y2):
+                    #print("no intersection")  
+                    continue
+                    
+                #print("objects intersect")
+                    
+                i_is_hand = box_i["object_num"] == 0
+                j_is_hand = box_j["object_num"] == 0
+
+                i_is_egg = box_i["object_num"] ==1
+                j_is_egg = box_j["object_num"] ==1 
+
+                i_is_ping_pong = box_i["object_num"]==2
+                j_is_ping_pong = box_j["object_num"]==2
+
+                if (i_is_egg and j_is_hand) or (j_is_egg and i_is_hand):
+                    #hand manipulation to begin
+                    print("pick up egg") 
+
+                if (i_is_ping_pong and j_is_hand) or (j_is_ping_pong and i_is_hand):
+                    #hand manipulation to begin
+                    print("pick up ping pong")
+                    
+        return
 
     def run_main_loop(self):
         """
-        Simulates your main application loop executing sequentially.
+        Test loop to run detection model on video
         """
         video_file = "video/raw/front_pickup_test.mov"
-        cap = cv2.VideoCapture(video_file)#self.camera
+        cap = cv2.VideoCapture(self.camera)#video_file
         
         while cap.isOpened():
             success, frame = cap.read()
@@ -447,7 +445,7 @@ class Hand_manupultion:
 
             # --- SYNCHRONOUS STEP 2: Run other application code sequentially ---
             # This logic safely runs knowing 'data' is fully populated
-            self.process_application_logic(data)
+            #self.process_application_logic(data)
             self.compare(data)
 
             # --- SYNCHRONOUS STEP 3: Display the frame ---
@@ -461,7 +459,8 @@ class Hand_manupultion:
 
     def process_application_logic(self, data):
         """
-        An example of other custom code in your class that depends on the data.
+        Print the items identified from the object detection model. 
+        Used for testing
         """
         #self.compare(data)
         print(f"--- Processing Frame Data Step (Total Objects: {len(data)}) ---")
