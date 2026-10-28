@@ -4,7 +4,7 @@
 # Because correct hand id was not known for sure, ask hand 1, 2, etc.
 # There was a response but reply contents were unexpected.
 
-from voltagerequest import get_hand_voltage
+from proof_of_work.hand_communication_serial.voltagerequest import get_hand_voltage
 import time
 
 for n in range(1, 255):
